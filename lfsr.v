@@ -26,9 +26,9 @@ module lfsr(clk, ar, sr, q);
   /*======================================
   Asynchronous Logic
   ======================================*/
-  assign polynomial = sr[7]^sr[5]^sr[4]^sr[3];
+  assign polynomial = sr[7]^sr[5]^sr[4]^sr[3]; // 8, 6, 5, 4
   assign q = sr[7];
-  
+
   /*======================================
   Synchronous Logic
   ======================================*/
@@ -40,7 +40,7 @@ module lfsr(clk, ar, sr, q);
         end
       else
         begin
-        sr <= { sr[6:0], polynomial };
+          sr <= { sr[6:0], polynomial };
         end
     end
 
