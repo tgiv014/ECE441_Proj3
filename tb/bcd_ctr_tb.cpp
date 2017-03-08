@@ -11,7 +11,6 @@ int main(int argc, char **argv, char **env) {
   unsigned int j;
   unsigned int num;
   unsigned int prevnum;
-  unsigned int prevstate;
   unsigned int failures;
 
   /*======================================
@@ -31,26 +30,24 @@ int main(int argc, char **argv, char **env) {
   ======================================*/
   top->clk = 1;
   top->ar = 1;
+  top->en = 1;
 
   prevnum = 0;
-  prevstate = 0;
   failures = 0;
   /*======================================
   Simulation Loop - Each iteration runs one rising edge
   ======================================*/
-  for(i=0;i<2000;i++)
+  for(i=0;i<100;i++)
   {
     for(j=0;j<2;j++){
-      top->ar = (i > 2); // ar is 0 when i <2. Gotta have resets
+      top->ar = (i > 2)&&(i!=30); // ar is 0 when i <2 or when i is 30
+      top->en = i<60;
       top->clk = j; // Toggle the clock (always)
-      top->start = (i==10) || (i==1500); // Start button pushed at cycles 10 and 1500
-      top->stop = (i==1600);
       top->eval ();
     }
     num = top->dig3*100+top->dig2*10+top->dig1;
-    printf("%d    State %d    Clock %d    i %d\n", num, top->state, top->clk, i);
-
-    prevstate=top->state;
+    printf("%d  |  Clock %d  |  i %d\n", num, top->clk, i);
+    
     prevnum=num;
     if (Verilated::gotFinish())  exit(0);
   }
