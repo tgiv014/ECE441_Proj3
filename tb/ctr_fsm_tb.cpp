@@ -45,6 +45,7 @@ int main(int argc, char **argv, char **env) {
       top->stop = (i==20)||(i>28&&i<32); // Stop the counter at 20 and 30
 
       top->eval ();
+      tfp->dump(i*2+j);
     }
     printf("ctr_en: %d    |    ctr_ar: %d    i: %d\n",top->ctr_en, top->ctr_ar, i);
     if (Verilated::gotFinish())  exit(0);
