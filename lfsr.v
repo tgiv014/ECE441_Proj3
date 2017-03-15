@@ -36,7 +36,7 @@ module lfsr(clk, ar, sr, q);
     begin
       if(~ar) // If reset has negedge down to level 0,
         begin
-          sr <= 0'b00000001;
+          sr <= 8'b00000001;
         end
       else
         begin
