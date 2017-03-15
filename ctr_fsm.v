@@ -13,10 +13,10 @@ module ctr_fsm(clk, ar, start, stop, ctr_en, ctr_ar);
   /*======================================
   Parameters
   ======================================*/
-  parameter [1:0] IDLE=2'b00, PRERUN=2'b01, RUN=2'b10;
+  parameter [1:0] IDLE=2'b00, PRERUN=2'b01, RUN=2'b10, STOPPED=2'b11;
 
   parameter start_assert = 1'b1; // LED is on when line is low, so start on low
-  parameter stop_assert = 1'b1; // Pushbutton down -> line high
+  parameter stop_assert = 1'b0; // Pushbutton down -> line high
   /*======================================
   Input/Output Declaration
   ======================================*/
@@ -34,7 +34,7 @@ module ctr_fsm(clk, ar, start, stop, ctr_en, ctr_ar);
   // Avoiding setting the outputs in the always block
   // We should never have to
   assign ctr_en = (state==RUN); // Enable is high when in run
-  assign ctr_ar = (state!=PRERUN)&(ar); // Pull ar low when in prerun or when in reset
+  assign ctr_ar = ~(state==PRERUN|state==IDLE); // Pull ar low when in prerun
 
   /*======================================
   Synchronous Logic
@@ -59,7 +59,7 @@ module ctr_fsm(clk, ar, start, stop, ctr_en, ctr_ar);
         PRERUN:begin
           if(stop==stop_assert)
           begin
-            state<=IDLE; // If the stop button is already down, go back to idle.
+            state<=STOPPED; // If the stop button is already down, go to stopped.
             // Odds are the user was holding the button down and just waiting.
             // Wouldn't be a very fun game if you always won.
           end else
@@ -67,13 +67,22 @@ module ctr_fsm(clk, ar, start, stop, ctr_en, ctr_ar);
             state<=RUN; // Ready to run!
           end
         end
-        default:begin // State is run
-          if(stop==stop_assert)
+        RUN:begin // State is run
+          if(stop==stop_assert) // If stop button pressed, stop
+          begin
+            state<=STOPPED;
+          end
+			 else begin
+            state<=RUN;
+          end
+        end
+		  default:begin // State is stopped
+          if(start==~start_assert) // Start has gone back to 0 (To Handle when LFSR is still 1)
           begin
             state<=IDLE;
           end else
           begin
-            state<=RUN;
+            state<=STOPPED; // Otherwise just stay put
           end
         end
       endcase

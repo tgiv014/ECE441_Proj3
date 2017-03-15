@@ -15,7 +15,7 @@ module tld(clock, ar, button, a1, b1, c1, d1, e1, f1, g1, a2, b2, c2, d2, e2, f2
   
   wire fast_clock, slow_clock, random_bit, ctr_en, ctr_ar;
   wire [3:0] dig1, dig2, dig3;
-
+  
   // Clock divider takes in 50MHz clock and outputs 2Hz and 1kHz clocks
   clock_divider clkdiv ( .clk(clock), .ar(ar), .x(slow_clock), .y(fast_clock));
 
@@ -29,5 +29,5 @@ module tld(clock, ar, button, a1, b1, c1, d1, e1, f1, g1, a2, b2, c2, d2, e2, f2
   sevseg_decoder decoder2 (.val(dig2), .a(a2), .b(b2), .c(c2), .d(d2), .e(e2), .f(f2), .g(g2));
   sevseg_decoder decoder3 (.val(dig3), .a(a3), .b(b3), .c(c3), .d(d3), .e(e3), .f(f3), .g(g3));
 
-  assign led = ~random_bit;
+  assign led = ctr_en;
 endmodule
